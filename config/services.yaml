@@ -36,6 +36,10 @@ services:
             $targetPdfDirectory: '%public_pdf_dir%'
             $targetThumbnailDirectory: '%public_thumbnail_dir%'
 
+    App\Formatter\ThumbnailFormatter:
+        arguments:
+            $targetDir: '%public_thumbnail_dir%'
+
     App\Service\PdfUploader:
         arguments:
             $targetDirectory: '%upload_pdf_dir%'
@@ -45,6 +49,14 @@ services:
             $targetDirectory: '%upload_thumbnail_dir%'
 
     App\Service\ThumbnailCreator:
+        arguments:
+            $targetDir: '%upload_thumbnail_dir%'
+
+    App\Service\PdfFileRemover:
+        arguments:
+            $targetDir: '%upload_pdf_dir%'
+
+    App\Service\ThumbnailFileRemover:
         arguments:
             $targetDir: '%upload_thumbnail_dir%'
 
