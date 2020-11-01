@@ -3,3 +3,50 @@
 body {
     background-color: lightgray;
 }
+
+.pdf-thumbnail {
+    opacity: 1;
+    display: block;
+    width: 100%;
+    height: auto;
+    transition: .5s ease;
+    backface-visibility: hidden;
+}
+
+.view-pdf-btn  {
+    transition: .5s ease;
+    opacity: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.delete-pdf-btn  {
+    transition: .5s ease;
+    opacity: 0;
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.pdf-item:hover .pdf-thumbnail {
+    opacity: 0.3;
+}
+
+.pdf-item:hover .view-pdf-btn {
+    opacity: 1;
+}
+
+.pdf-item:hover .delete-pdf-btn {
+    opacity: 1;
+}
+
+.additional-pdf-info {
+    text-align: left;
+}
