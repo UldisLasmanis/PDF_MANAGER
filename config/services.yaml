@@ -4,6 +4,10 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
+    public_pdf_dir:         '/uploads/pdf/'
+    public_thumbnail_dir:   '/uploads/thumbnail/'
+    upload_pdf_dir:         '%kernel.project_dir%/public/uploads/pdf/'
+    upload_thumbnail_dir:   '%kernel.project_dir%/public/uploads/thumbnail/'
 
 services:
     # default configuration for services in *this* file
@@ -26,6 +30,11 @@ services:
     App\Controller\:
         resource: '../src/Controller/'
         tags: ['controller.service_arguments']
+
+    App\Formatter\PdfFormatter:
+        arguments:
+            $targetPdfDirectory: '%public_pdf_dir%'
+            $targetThumbnailDirectory: '%public_thumbnail_dir%'
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

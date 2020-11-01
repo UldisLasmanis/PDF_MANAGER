@@ -19,32 +19,15 @@ class PDFRepository extends ServiceEntityRepository
         parent::__construct($registry, PDF::class);
     }
 
-    // /**
-    //  * @return PDF[] Returns an array of PDF objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function findByOffset($offset, $limit = 20)
     {
         return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('p.id', 'ASC')
-            ->setMaxResults(10)
+            ->orderBy('p.uploaded_at', 'ASC')
+            ->setFirstResult($offset)
+            ->setMaxResults($limit)
             ->getQuery()
-            ->getResult()
+            ->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY)
         ;
     }
-    */
 
-    /*
-    public function findOneBySomeField($value): ?PDF
-    {
-        return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }
