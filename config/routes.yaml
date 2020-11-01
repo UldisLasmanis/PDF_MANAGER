@@ -2,3 +2,8 @@ documents:
   path: /documents
   controller: App\Controller\PDFController::getDocuments
   methods: GET
+
+upload_document:
+  path: /documents
+  controller: App\Controller\PDFController::uploadDocument
+  methods: POST

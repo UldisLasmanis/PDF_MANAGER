@@ -20,10 +20,10 @@ class PdfFormatter implements IFormatter
         $result = [];
         foreach ($items as $item) {
             $result[] = [
-                'original_filename' => $item['original_filename'],
+                'original_filename' => $item['filename_original'],
                 'md5_filename' => $item['filename_MD5'],
                 'file_path' => $this->getTargetDir() . $item['filename_MD5'],
-                'thumbnail_path' => $this->getTargetThumbnailDir() . $item['thumbnail_md5_filename'],
+                'thumbnail_path' => $this->getTargetThumbnailDir() . $item['thumbnail_filename'],
                 'size_in_KB' => round($item['size_in_bytes'] / 1024, 2),
                 'page_cnt' => $item['page_cnt'],
                 'uploaded_at' => $item['uploaded_at']->format('Y-m-d H:i:s')

@@ -42,6 +42,11 @@ class PDF
      */
     private $uploaded_at;
 
+    /**
+     * @ORM\Column(type="string", length=100)
+     */
+    private $thumbnail_filename;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -103,6 +108,18 @@ class PDF
     public function setUploadedAt(\DateTimeInterface $uploaded_at): self
     {
         $this->uploaded_at = $uploaded_at;
+
+        return $this;
+    }
+
+    public function getThumbnailFilename(): ?string
+    {
+        return $this->thumbnail_filename;
+    }
+
+    public function setThumbnailFilename(string $thumbnail_filename): self
+    {
+        $this->thumbnail_filename = $thumbnail_filename;
 
         return $this;
     }

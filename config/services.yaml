@@ -36,5 +36,17 @@ services:
             $targetPdfDirectory: '%public_pdf_dir%'
             $targetThumbnailDirectory: '%public_thumbnail_dir%'
 
+    App\Service\PdfUploader:
+        arguments:
+            $targetDirectory: '%upload_pdf_dir%'
+
+    App\Service\ThumbnailUploader:
+        arguments:
+            $targetDirectory: '%upload_thumbnail_dir%'
+
+    App\Service\ThumbnailCreator:
+        arguments:
+            $targetDir: '%upload_thumbnail_dir%'
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
