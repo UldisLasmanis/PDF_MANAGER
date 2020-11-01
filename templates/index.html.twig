@@ -1,0 +1,46 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+    <div class="container col-8 text-center">
+        <div>
+            <button id="add_new_doc_btn" class="btn-primary" style="float:right">
+                <i class="fa fa-upload"></i>
+            </button>
+            <div style="display: none" id="upload_new_document_form">
+                <form action="{{ path('documents') }}"
+                      class="dropzone"
+                      method="POST" enctype="multipart/form-data"
+                      id="myDropzone">
+                </form>
+            </div>
+        </div>
+        {% if items is not empty %}
+            <div class="row">
+                {% for item in items %}
+                    <div class="col-sm-3 pdf-item">
+                        <img src="{{ item.thumbnail_path }}" alt="{{ item.original_filename }}" class="pdf-thumbnail" style="width:100%">
+                        <button type="button" class="btn btn-info btn-sm view-pdf-btn"
+                                data-toggle="modal" data-target="#pdf_viewer_modal"
+                                data-path="{{ item.file_path }}"><i class="fa fa-eye"></i>
+                        </button>
+                        <button type="button" class="btn btn-danger btn-sm delete-pdf-btn"
+                                data-path="{{ item.file_path }}" data-filename="{{ item.md5_filename }}">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                        <div class="additional-pdf-info">
+                            <b>{{ item.original_filename }}</b> <br>
+                            <i>Added:</i> {{ item.uploaded_at }}
+                            <i>Pages:</i> {{ item.page_cnt }} <br>
+                            <i>Size:</i> {{ item.size_in_KB }} KB
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center">
+                <h2>No Data</h2>
+            </div>
+        {% endif %}
+    </div>
+
+{% endblock %}
