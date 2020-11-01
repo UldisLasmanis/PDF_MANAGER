@@ -19,32 +19,41 @@ class ThumbnailRepository extends ServiceEntityRepository
         parent::__construct($registry, Thumbnail::class);
     }
 
-    // /**
-    //  * @return Thumbnail[] Returns an array of Thumbnail objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function getRecordsBy(array $whereClauses)
     {
-        return $this->createQueryBuilder('t')
-            ->andWhere('t.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('t.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
+        $request = $this->createQueryBuilder('t');
 
-    /*
-    public function findOneBySomeField($value): ?Thumbnail
-    {
-        return $this->createQueryBuilder('t')
-            ->andWhere('t.exampleField = :val')
-            ->setParameter('val', $value)
+        if (!empty($whereClauses)) {
+            foreach ($whereClauses as $colName => $colValue) {
+                $request
+                    ->andWhere('t.' . $colName . ' = :' . $colName)
+                    ->setParameter($colName, $colValue)
+                ;
+            }
+        }
+
+        return $request
+            ->orderBy('t.page_nr', 'ASC')
             ->getQuery()
-            ->getOneOrNullResult()
-        ;
+            ->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
     }
-    */
+
+    public function getSingleRecordBy(array $whereClauses)
+    {
+        $request = $this->createQueryBuilder('t');
+
+        if (!empty($whereClauses)) {
+            foreach ($whereClauses as $colName => $colValue) {
+                $request
+                    ->andWhere('t.' . $colName . ' = :' . $colName)
+                    ->setParameter($colName, $colValue)
+                ;
+            }
+        }
+
+        return $request
+            ->orderBy('t.page_nr', 'ASC')
+            ->getQuery()
+            ->getSingleResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
+    }
 }

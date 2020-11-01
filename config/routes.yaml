@@ -7,3 +7,23 @@ upload_document:
   path: /documents
   controller: App\Controller\PDFController::uploadDocument
   methods: POST
+
+view_document:
+  path: /documents/{document}
+  controller: App\Controller\PDFController::viewDocument
+  methods: GET
+
+delete_document:
+  path: /documents/{document}
+  controller: App\Controller\PDFController::deleteDocument
+  methods: DELETE
+
+view_all_attachments:
+  path: /documents/{document}/attachment/previews
+  controller: App\Controller\PDFController::viewAllThumbnails
+  methods: GET
+
+view_one_attachment:
+  path: /documents/{document}/attachment/previews/{preview}
+  controller: App\Controller\PDFController::viewOneThumbnail
+  methods: GET
