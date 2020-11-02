@@ -9,18 +9,25 @@ class PdfFileRemover implements IFileRemover
 
     private $targetDir;
 
-    public function __construct(string $targetDir)
+    public function deleteMultiple(array $filenames)
     {
-        $this->targetDir = $targetDir;
+        foreach ($filenames as $filename) {
+            $this->deleteFile($filename);
+        }
     }
 
     public function deleteFile(string $filename)
     {
-        $fullPath = $this->getDirectory() . $filename;
+        $fullPath = $this->getTargetDir() . $filename;
         unlink($fullPath);
     }
 
-    public function getDirectory(): string
+    public function setTargetDir(string $targetDir)
+    {
+        $this->targetDir = $targetDir;
+    }
+
+    public function getTargetDir(): string
     {
         return $this->targetDir;
     }

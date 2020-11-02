@@ -19,7 +19,7 @@ class ThumbnailRepository extends ServiceEntityRepository
         parent::__construct($registry, Thumbnail::class);
     }
 
-    public function getRecordsBy(array $whereClauses)
+    public function getEntitiesBy(array $whereClauses)
     {
         $request = $this->createQueryBuilder('t');
 
@@ -35,7 +35,7 @@ class ThumbnailRepository extends ServiceEntityRepository
         return $request
             ->orderBy('t.page_nr', 'ASC')
             ->getQuery()
-            ->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
+            ->getResult();
     }
 
     public function getSingleRecordBy(array $whereClauses)

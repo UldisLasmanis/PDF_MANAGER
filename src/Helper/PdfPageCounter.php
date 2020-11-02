@@ -13,7 +13,13 @@ class PdfPageCounter implements IDocumentPageCounter
             throw new \Exception('File in path ' . $fullPath . ' does not exist');
         }
 
-        $document = new \Imagick($fullPath);
-        return $document->getNumberImages();
+        try {
+            $document = new \Imagick($fullPath);
+            $count = $document->getNumberImages();
+        } catch (\ImagickException $e) {
+            return 'PDF page counting exited with error: ' . $e->getMessage();
+        }
+
+        return $count;
     }
 }

@@ -8,11 +8,6 @@ class ThumbnailFormatter implements IFormatter
 {
     private $targetDir;
 
-    public function __construct(string $targetDir)
-    {
-        $this->targetDir = $targetDir;
-    }
-
     public function format(array $list): array
     {
         $result = [];
@@ -32,6 +27,11 @@ class ThumbnailFormatter implements IFormatter
             'page_nr' => $item['page_nr'],   //page_index starts with 0, but page_nr needs to start from 1
             'uploaded_at' => $item['uploaded_at']->format('Y-m-d H:i:s')
         ];
+    }
+
+    public function setTargetDir(string $targetDir)
+    {
+        $this->targetDir = $targetDir;
     }
 
     public function getTargetDir(): string

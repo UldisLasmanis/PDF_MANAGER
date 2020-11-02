@@ -4,6 +4,8 @@ namespace App\Repository;
 
 use App\Entity\PDF;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -46,7 +48,13 @@ class PDFRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function getEntityBy(array $whereClauses, bool $returnRecord = false)
+    /**
+     * @param array $whereClauses
+     * @throws NoResultException
+     * @throws NonUniqueResultException
+     * @return PDF
+     */
+    public function getEntityBy(array $whereClauses): PDF
     {
         $request = $this->createQueryBuilder('p');
 
@@ -59,17 +67,9 @@ class PDFRepository extends ServiceEntityRepository
             }
         }
 
-        if (true === $returnRecord) {
-            return $request
-                ->getQuery()
-                ->getSingleResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY)
-            ;
-        }
-
         return $request
             ->getQuery()
-            ->getSingleResult()
-        ;
+            ->getSingleResult();
     }
 
 }

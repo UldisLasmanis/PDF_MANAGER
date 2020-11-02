@@ -31,34 +31,48 @@ services:
         resource: '../src/Controller/'
         tags: ['controller.service_arguments']
 
-    App\Formatter\PdfFormatter:
-        arguments:
-            $targetPdfDirectory: '%public_pdf_dir%'
-            $targetThumbnailDirectory: '%public_thumbnail_dir%'
+#    App\Formatter\PdfFormatter:
+#        arguments:
+#            $targetPdfDirectory: '%public_pdf_dir%'
+#            $targetThumbnailDirectory: '%public_thumbnail_dir%'
 
-    App\Formatter\ThumbnailFormatter:
-        arguments:
-            $targetDir: '%public_thumbnail_dir%'
+#    App\Formatter\ThumbnailFormatter:
+#        arguments:
+#            $targetDir: '%public_thumbnail_dir%'
 
-    App\Service\PdfUploader:
-        arguments:
-            $targetDirectory: '%upload_pdf_dir%'
+#    App\Service\PdfUploader:
+#        arguments:
+#            $targetDirectory: '%upload_pdf_dir%'
 
-    App\Service\ThumbnailUploader:
-        arguments:
-            $targetDirectory: '%upload_thumbnail_dir%'
+#    App\Service\ThumbnailUploader:
+#        arguments:
+#            $targetDirectory: '%upload_thumbnail_dir%'
 
-    App\Service\ThumbnailCreator:
-        arguments:
-            $targetDir: '%upload_thumbnail_dir%'
+#    App\Service\ThumbnailCreator:
+#        arguments:
+#            $targetDir: '%upload_thumbnail_dir%'
 
-    App\Service\PdfFileRemover:
-        arguments:
-            $targetDir: '%upload_pdf_dir%'
+#    App\Service\PdfFileRemover:
+#        arguments:
+#            $targetDir: '%upload_pdf_dir%'
 
-    App\Service\ThumbnailFileRemover:
+#    App\Service\ThumbnailFileRemover:
+#        arguments:
+#            $targetDir: '%upload_thumbnail_dir%'
+
+    pdf_data_retriever:
+        class: App\Service\PdfDataRetriever
         arguments:
-            $targetDir: '%upload_thumbnail_dir%'
+            ['@doctrine.orm.entity_manager']
+    file_upload_manager:
+        class: App\Service\FileUploadManager
+        arguments:
+            ['@doctrine.orm.entity_manager']
+
+    file_remover:
+        class: App\Service\FileRemover
+#        arguments:
+#            [ '@doctrine.orm.entity_manager' ]
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

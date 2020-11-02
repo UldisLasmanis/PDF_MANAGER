@@ -1,29 +1,34 @@
+root:
+  path: /
+  controller: App\Controller\PDFController::index
+  methods: GET
+
 documents:
   path: /documents
-  controller: App\Controller\PDFController::getDocuments
+  controller: App\Controller\Xhr\PDFXhrController::getDocuments
   methods: GET
 
 upload_document:
   path: /documents
-  controller: App\Controller\PDFController::uploadDocument
+  controller: App\Controller\Xhr\PDFXhrController::uploadDocument
   methods: POST
 
 view_document:
   path: /documents/{document}
-  controller: App\Controller\PDFController::viewDocument
+  controller: App\Controller\Xhr\PDFXhrController::viewDocument
   methods: GET
 
 delete_document:
   path: /documents/{document}
-  controller: App\Controller\PDFController::deleteDocument
+  controller: App\Controller\Xhr\PDFXhrController::deleteDocument
   methods: DELETE
 
 view_all_attachments:
   path: /documents/{document}/attachment/previews
-  controller: App\Controller\PDFController::viewAllThumbnails
+  controller: App\Controller\Xhr\PDFXhrController::viewAllThumbnails
   methods: GET
 
 view_one_attachment:
   path: /documents/{document}/attachment/previews/{preview}
-  controller: App\Controller\PDFController::viewOneThumbnail
+  controller: App\Controller\Xhr\PDFXhrController::viewOneThumbnail
   methods: GET

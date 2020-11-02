@@ -7,12 +7,12 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class PdfUploader implements IFileUploader
 {
-    private $targetDirectory;
-
-    public function __construct($targetDirectory)
-    {
-        $this->targetDirectory = $targetDirectory;
-    }
+    private $targetDir;
+//
+//    public function __construct($targetDirectory)
+//    {
+//        $this->targetDirectory = $targetDirectory;
+//    }
 
     public function upload(UploadedFile $file)
     {
@@ -20,26 +20,31 @@ class PdfUploader implements IFileUploader
 
         try {
             $this->createDirIfNotExists();
-            $file->move($this->getTargetDirectory(), $fileName);
+            $file->move($this->getTargetDir(), $fileName);
         } catch (FileException $e) {
-            dd($e->getMessage());
+            return $e->getMessage();
         }
 
         return [
             'filename' => $fileName,
-            'path' => $this->getTargetDirectory() . '/' . $fileName
+            'path' => $this->getTargetDir() . '/' . $fileName
         ];
     }
 
-    public function getTargetDirectory(): string
+    public function setTargetDir(string $targetDir)
     {
-        return $this->targetDirectory;
+        $this->targetDir = $targetDir;
+    }
+
+    public function getTargetDir(): string
+    {
+        return $this->targetDir;
     }
 
     public function createDirIfNotExists(): void
     {
-        if (!file_exists($this->getTargetDirectory()) && !is_dir($this->getTargetDirectory())) {
-            mkdir($this->getTargetDirectory(), 0775, true);
+        if (!file_exists($this->getTargetDir()) && !is_dir($this->getTargetDir())) {
+            mkdir($this->getTargetDir(), 0775, true);
         }
     }
 }

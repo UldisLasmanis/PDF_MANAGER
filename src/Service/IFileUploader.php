@@ -8,7 +8,8 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 interface IFileUploader
 {
-    public function getTargetDirectory();
+    public function getTargetDir();
+    public function setTargetDir(string $targetDir);
     public function upload(UploadedFile $file);
     public function createDirIfNotExists();
 }
