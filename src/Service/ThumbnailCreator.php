@@ -8,12 +8,7 @@ class ThumbnailCreator
 {
     private $targetDir;
 
-    public function __construct(string $targetDir)
-    {
-        $this->targetDir = $targetDir;
-    }
-
-    public function createFromPdf(string $sourcePath, int $pageCnt): array
+    public function createFromPdf(string $sourcePath, int $pageCnt)
     {
         $result = [];
         if ($pageCnt <= 0) {
@@ -22,7 +17,7 @@ class ThumbnailCreator
 
         for ($i = 0; $i < $pageCnt; $i++) {
             $fileName = md5(uniqid()) . '.jpg';
-            $fullPath = $this->getTargetDirectory() . $fileName;
+            $fullPath = $this->getTargetDir() . $fileName;
 
             try {
                 $image = new \Imagick;
@@ -38,14 +33,19 @@ class ThumbnailCreator
                     'size_in_bytes' => strlen($image->getImageBlob())
                 ];
             } catch (\ImagickException $e) {
-                dd($e->getMessage());
+                return $e->getMessage();
             }
         }
 
         return $result;
     }
 
-    public function getTargetDirectory(): string
+    public function setTargetDir(string $targetDir)
+    {
+        $this->targetDir = $targetDir;
+    }
+
+    public function getTargetDir(): string
     {
         return $this->targetDir;
     }

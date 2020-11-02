@@ -8,25 +8,25 @@ class ThumbnailFileRemover implements IFileRemover
 {
     private $targetDir;
 
-    public function __construct(string $targetDir)
+    public function deleteFile(string $filename)
+    {
+        $fullPath = $this->getTargetDir() . $filename;
+        unlink($fullPath);
+    }
+
+    public function deleteMultiple(array $filenames)
+    {
+        foreach ($filenames as $filename) {
+            $this->deleteFile($filename);
+        }
+    }
+
+    public function setTargetDir(string $targetDir)
     {
         $this->targetDir = $targetDir;
     }
 
-    public function deleteFile(string $filename)
-    {
-        $fullPath = $this->getDirectory() . $filename;
-        unlink($fullPath);
-    }
-
-    public function deleteMultiple(array $items)
-    {
-        foreach ($items as $item) {
-            $this->deleteFile($item->getFilename());
-        }
-    }
-
-    public function getDirectory(): string
+    public function getTargetDir(): string
     {
         return $this->targetDir;
     }

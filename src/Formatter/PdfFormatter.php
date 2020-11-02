@@ -4,16 +4,18 @@
 namespace App\Formatter;
 
 
-class PdfFormatter implements IFormatter
+use App\Exceptions\MyThrownException;
+
+class PdfFormatter
 {
     private $targetPdfDirectory;
     private $targetThumbnailDirectory;
 
-    public function __construct($targetPdfDirectory, $targetThumbnailDirectory)
-    {
-        $this->targetPdfDirectory = $targetPdfDirectory;
-        $this->targetThumbnailDirectory = $targetThumbnailDirectory;
-    }
+//    public function __construct($targetPdfDirectory, $targetThumbnailDirectory)
+//    {
+//        $this->targetPdfDirectory = $targetPdfDirectory;
+//        $this->targetThumbnailDirectory = $targetThumbnailDirectory;
+//    }
 
     public function format(array $items): array
     {
@@ -38,8 +40,18 @@ class PdfFormatter implements IFormatter
         return $this->targetPdfDirectory;
     }
 
-    public function getTargetThumbnailDir()
+    public function setTargetDir(string $targetDir)
+    {
+        $this->targetPdfDirectory = $targetDir;
+    }
+
+    public function getTargetThumbnailDir(): string
     {
         return $this->targetThumbnailDirectory;
+    }
+
+    public function setTargetThumbnailDir(string $targetDir)
+    {
+        $this->targetThumbnailDirectory = $targetDir;
     }
 }

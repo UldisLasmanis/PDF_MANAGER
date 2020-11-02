@@ -4,26 +4,27 @@
 namespace App\Service;
 
 
+use App\Exceptions\MyThrownException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ThumbnailUploader
 {
-    private $targetDirectory;
-
-    public function __construct(string $targetDirectory)
-    {
-        $this->targetDirectory = $targetDirectory;
-        $this->createDirIfNotExists();
-    }
+    private $targetDir;
+//
+//    public function __construct(string $targetDirectory)
+//    {
+//        $this->targetDirectory = $targetDirectory;
+//        $this->createDirIfNotExists();
+//    }
 
     public function createDirIfNotExists()
     {
-        if (!file_exists($this->getTargetDirectory()) && !is_dir($this->getTargetDirectory())) {
-            mkdir($this->getTargetDirectory(), 0775, true);
+        if (!file_exists($this->getTargetDir()) && !is_dir($this->getTargetDir())) {
+            mkdir($this->getTargetDir(), 0775, true);
         }
     }
 
-    public function uploadMulti(array $thumbnails): void
+    public function uploadMulti(array $thumbnails)
     {
         foreach ($thumbnails as $thumbnail) {
             /** @var \Imagick $image */
@@ -33,7 +34,7 @@ class ThumbnailUploader
                 $image->clear();
                 $image->destroy();
             } catch (\ImagickException $e) {
-                dd($e->getMessage());
+                return 'File saving exited with error: ' . $e->getMessage();
             }
         }
     }
@@ -42,7 +43,7 @@ class ThumbnailUploader
     public function upload(UploadedFile $file, string $pdfFileFullPath)
     {
         $fileName = md5(uniqid()) . '.jpg';
-        $fullPath = $this->getTargetDirectory() . $fileName;
+        $fullPath = $this->getTargetDir() . $fileName;
 
         try {
             $image = new \Imagick;
@@ -60,8 +61,13 @@ class ThumbnailUploader
         return $fileName;
     }
 
-    public function getTargetDirectory()
+    public function setTargetDir(string $targetDir)
     {
-        return $this->targetDirectory;
+        $this->targetDir = $targetDir;
+    }
+
+    public function getTargetDir(): string
+    {
+        return $this->targetDir;
     }
 }

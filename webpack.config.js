@@ -23,9 +23,7 @@ Encore
      * Each entry will result in one JavaScript file (e.g. app.js)
      * and one CSS file (e.g. app.css) if your JavaScript imports CSS.
      */
-    .addEntry('dropzone_js', './assets/dropzone/dropzone.js')
     .addEntry('app', './assets/app.js')
-    .addStyleEntry('dropzone_css', './assets/dropzone/dropzone.css')
 
     // When enabled, Webpack "splits" your files into smaller pieces for greater optimization.
     .splitEntryChunks()
