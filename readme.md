@@ -23,6 +23,12 @@
     CustomLog ${APACHE_LOG_DIR}/access.log combined
 </VirtualHost>
 ```
+
+# Setting-up video
+Click on the gif to see full video.  
+[![Alt text for your video](https://github.com/UldisLasmanis/PDF_Manager/blob/master/public/instructions/pdf_manager_setup_preview.gif)](https://drive.google.com/file/d/17tgYKFWxpkHEdlhiCFFGvaQCnYzsBUBq/view)
+
+
 # Setting-up
 Copy project repository
 > git clone git@github.com:UldisLasmanis/PDF_Manager.git 
