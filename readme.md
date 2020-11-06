@@ -11,6 +11,14 @@ Install composer dependencies
 Install Yarn packages
 > yarn install
 
+Compile assets (add "--watch" for automatic recompilation after file changes)
+> yarn encore dev
+
+Create empty database `sunfinance` (name can be changed in .env file)
+> php bin/console doctrine:database:create
+
+Migrate migrations to DB
+> php bin/console doctrine:migrations:migrate
 
 # Using
 Upload:  
