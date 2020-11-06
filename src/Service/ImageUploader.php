@@ -73,17 +73,9 @@ class ImageUploader extends Uploader
         return $this->filename;
     }
 
-    public function createDirIfNotExists()
-    {
-        if (!file_exists($this->getTargetDir()) && !is_dir($this->getTargetDir())) {
-            mkdir($this->getTargetDir(), 0775, true);
-        }
-    }
-
     public function setTargetDir(string $targetDir)
     {
         $this->targetDir = $targetDir;
-        $this->createDirIfNotExists();
     }
 
     public function getTargetDir(): string

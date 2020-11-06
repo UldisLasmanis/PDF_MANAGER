@@ -15,19 +15,11 @@ class FileUploader extends Uploader
     public function setTargetDir(string $targetDir)
     {
         $this->targetDir = $targetDir;
-        $this->createDirIfNotExists();
     }
 
     public function getTargetDir(): string
     {
         return $this->targetDir;
-    }
-
-    public function createDirIfNotExists(): void
-    {
-        if (!file_exists($this->getTargetDir()) && !is_dir($this->getTargetDir())) {
-            mkdir($this->getTargetDir(), 0775, true);
-        }
     }
 
     public function setFilename(string $filename)

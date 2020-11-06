@@ -1,8 +1,8 @@
 
 /.idea/
-/public/uploads/attachment/
-/public/uploads/image/
-/public/uploads/pdf/
+/public/uploads/attachment/*
+/public/uploads/image/*
+/public/uploads/pdf/*
 ###> symfony/framework-bundle ###
 /.env.local
 /.env.local.php

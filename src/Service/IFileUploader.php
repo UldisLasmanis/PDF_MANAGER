@@ -13,5 +13,4 @@ interface IFileUploader
     public function getFilename(): string;
     public function setFilename(string $filename);
     public function upload(File $file);
-    public function createDirIfNotExists();
 }
