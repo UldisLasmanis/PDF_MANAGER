@@ -1,5 +1,8 @@
 
 /.idea/
+/public/uploads/attachment/
+/public/uploads/image/
+/public/uploads/pdf/
 ###> symfony/framework-bundle ###
 /.env.local
 /.env.local.php
@@ -19,7 +22,6 @@
 ###> symfony/webpack-encore-bundle ###
 /node_modules/
 /public/build/
-/public/uploads/
 npm-debug.log
 yarn-error.log
 ###< symfony/webpack-encore-bundle ###
