@@ -1,3 +1,28 @@
+# Requirements:  
+* PHP 7.4+
+* Apache2
+* MySql
+* Configured hosts file (127.0.0.1 localhost) 
+* Configured virtual hosts, example:
+```
+<VirtualHost *:80>
+    ServerAdmin webmaster@localhost
+    ServerName localhost
+    ServerAlias localhost
+    DocumentRoot /var/www/PDF_Manager/public
+
+   <Directory /var/www/PDF_Manager/public>
+        AllowOverride None
+        Order Allow,Deny
+        Allow from All
+
+        FallbackResource /index.php
+    </Directory>
+
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
+```
 # Setting-up
 Copy project repository
 > git clone git@github.com:UldisLasmanis/PDF_Manager.git 
@@ -31,6 +56,7 @@ If folder owner is `your_root_username` (ex. `uldis`), then run this command if 
 > sudo chown -R www-data .
 
 Now you should be able to upload/remove files
+
 
 # Using
 Upload:  
