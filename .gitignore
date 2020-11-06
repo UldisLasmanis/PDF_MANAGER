@@ -1,8 +1,13 @@
 
 /.idea/
+### Dont store uploaded files in repo
 /public/uploads/attachment/*
 /public/uploads/image/*
 /public/uploads/pdf/*
+### Ignore everything except .gitkeep
+!/public/uploads/attachment/.gitkeep
+!/public/uploads/image/.gitkeep
+!/public/uploads/pdf/.gitkeep
 ###> symfony/framework-bundle ###
 /.env.local
 /.env.local.php
