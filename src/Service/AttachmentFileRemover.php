@@ -4,10 +4,8 @@
 namespace App\Service;
 
 
-class ThumbnailFileRemover implements IFileRemover
+class AttachmentFileRemover extends Remover
 {
-    private $targetDir;
-
     public function deleteFile(string $filename)
     {
         $fullPath = $this->getTargetDir() . $filename;

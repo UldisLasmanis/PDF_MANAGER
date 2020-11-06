@@ -2,7 +2,6 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
         {% block stylesheets %}
             {{ encore_entry_link_tags('app') }}
         {% endblock %}
@@ -12,9 +11,6 @@
 
     {% block javascripts %}
         {{ encore_entry_script_tags('app') }}
-        <script
-                src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.0.943/pdf.min.js">
-        </script>
     {% endblock %}
     </body>
 </html>

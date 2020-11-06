@@ -4,44 +4,42 @@
 namespace App\Service;
 
 
-use App\Entity\PDF;
-use App\Entity\Thumbnail;
-use App\Exceptions\MyThrownException;
+use App\Helper\FileNameUrlizer;
 use App\Helper\PdfPageCounter;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\File\File;
+
 
 class FileUploadManager extends AbstractController
 {
-    private $em;
-    public function __construct(EntityManagerInterface $em)
+    public function upload(File $uploadedFile): array
     {
-        $this->em = $em;
-    }
+        $fileUploader = new FileUploader();
+        $fileUploader->setTargetDir($this->getParameter('upload_pdf_dir'));
+        $fileUploader->setFilename(FileNameUrlizer::urlizeFile($uploadedFile));
+        $pdfFileInfo = $fileUploader->upload($uploadedFile);
 
-    public function upload(UploadedFile $uploadedFile)
-    {
-        $pdfFileUploader = new PdfUploader();
-        $pdfFileUploader->setTargetDir($this->getParameter('upload_pdf_dir'));
-        $pdfFileInfo = $pdfFileUploader->upload($uploadedFile);
+        $imageUploader = new ImageUploader();
+        $imageUploader->setTargetDir($this->getParameter('upload_image_dir'));
+        $imageUploader->setFilename(FileNameUrlizer::urlizeImagick());
+        $ImageInfo = $imageUploader->upload($pdfFileInfo);
 
         $pageCounter = new PdfPageCounter();
-        $pageCount = $pageCounter->count($pdfFileInfo['path']);
-
-        $thumbnailCreator = new ThumbnailCreator();
-        $thumbnailCreator->setTargetDir($this->getParameter('upload_thumbnail_dir'));
-        $thumbnailResources = $thumbnailCreator->createFromPdf($pdfFileInfo['path'], $pageCount);
-
-        $thumbnailUploader = new ThumbnailUploader();
-        $thumbnailUploader->setTargetDir($this->getParameter('upload_thumbnail_dir'));
-        $thumbnailUploader->uploadMulti($thumbnailResources);
+        $pageCount = $pageCounter->count($pdfFileInfo->getRealPath());
 
         return [
-            'thumbnails' => $thumbnailResources,
-            'pdf_filename' => $pdfFileInfo['filename'],
+            'image' => $ImageInfo,
+            'pdf' => $pdfFileInfo,
             'page_count' => $pageCount
         ];
+    }
+
+    public function uploadAttachment(File $uploadedFile): File
+    {
+        $fileUploader = new FileUploader();
+        $fileUploader->setTargetDir($this->getParameter('upload_attachment_dir'));
+        $fileUploader->setFilename(FileNameUrlizer::urlizeFile($uploadedFile));
+
+        return $fileUploader->upload($uploadedFile);
     }
 }

@@ -4,27 +4,35 @@
 namespace App\Controller\Xhr;
 
 
-use App\Exceptions\MyThrownException;
-use App\Formatter\ThumbnailFormatter;
-use App\Repository\ThumbnailRepository;
+use App\Exceptions\AttachmentExistsException;
+use App\Service\AttachmentFileRemover;
 use App\Service\FileRemover;
 use App\Service\FileUploadManager;
 use App\Service\PdfDataRetriever;
+use App\Service\PdfFileRemover;
+use App\Service\ImageFileRemover;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\Exception\NoFileException;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
 class PDFXhrController extends AbstractController
 {
-    private $dataRetriever;
-    private $uploadManager;
-    private $fileRemover;
+    private PdfDataRetriever $dataRetriever;
+    private FileUploadManager $uploadManager;
+    private FileRemover $fileRemover;
 
-    public function __construct(PdfDataRetriever $dataRetriever, FileUploadManager $uploadManager, FileRemover $fileRemover)
+    public function __construct(
+        PdfDataRetriever $dataRetriever,
+        FileUploadManager $uploadManager,
+        FileRemover $fileRemover
+    )
     {
         $this->dataRetriever = $dataRetriever;
         $this->uploadManager = $uploadManager;
@@ -47,27 +55,44 @@ class PDFXhrController extends AbstractController
     }
 
     /**
+     * @Route("/documents/{document}", name="view_document", methods={"GET"})
+     * @param Request $request
+     * @return BinaryFileResponse
+     */
+    public function viewDocument(Request $request): BinaryFileResponse
+    {
+        $filename = $request->get('document');
+        $fullPath = $this->getParameter('upload_pdf_dir') . $filename;
+
+        if (!file_exists($fullPath)) {
+            throw new NotFoundHttpException('File does not exist in specified path');
+        }
+
+        $response = new BinaryFileResponse($fullPath);
+        $response->headers->set('Content-type','application/pdf');
+
+        $response->send();
+
+        return $response;
+    }
+
+    /**
      * @Route ("/documents", name="upload_document", methods={"POST"})
      * @param Request $request
-     * @throws MyThrownException
+     * @throws NoFileException
      * @return JsonResponse
      */
     public function uploadDocument(Request $request): JsonResponse
     {
         $uploadedFile = $request->files->get('file');
         if (null === $uploadedFile) {
-            throw new MyThrownException('No file received');
+            throw new NoFileException('No file received');
         }
 
         try {
             $uploadResponse = $this->uploadManager->upload($uploadedFile);
             $this->dataRetriever->save($uploadedFile, $uploadResponse);
-        } catch (FileException $e) {
-            return new JsonResponse([
-                'success' => false,
-                'message' => 'Upload failed with error: ' . $e->getMessage()
-            ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return new JsonResponse([
                 'success' => false,
                 'message' => 'Upload failed with error: ' . $e->getMessage()
@@ -81,32 +106,6 @@ class PDFXhrController extends AbstractController
     }
 
     /**
-     * @Route("/documents/{document}", name="view_document", methods={"GET"})
-     * @param Request $request
-     * @return BinaryFileResponse
-     */
-    public function viewDocument(Request $request): BinaryFileResponse
-    {
-        if (empty($request->get('document'))) {
-            dd('Missing parameter `document`');
-        }
-
-        $filename = $request->get('document');
-        $fullPath = $this->getParameter('upload_pdf_dir') . viewAllThumbnails . '.pdf';
-
-        if (!file_exists($fullPath)) {
-            dd('No file found!');
-        }
-
-        $response = new BinaryFileResponse($fullPath);
-        $response->headers->set('Content-type','application/pdf');
-
-        $response->send();
-
-        return $response;
-    }
-
-    /**
      * @Route("/documents/{document}", name="delete_document", methods={"DELETE"})
      * @param Request $request
      * @return JsonResponse
@@ -115,8 +114,21 @@ class PDFXhrController extends AbstractController
     {
         try {
             $filePaths = $this->dataRetriever->manageDelete($request);
+
+            $pdfFileRemover = new PdfFileRemover();
+            $pdfFileRemover->setTargetDir($this->getParameter('upload_pdf_dir'));
+
+            $imageRemover = new ImageFileRemover();
+            $imageRemover->setTargetDir($this->getParameter('upload_image_dir'));
+
+            $attachmentFileRemover = new AttachmentFileRemover();
+            $attachmentFileRemover->setTargetDir($this->getParameter('upload_attachment_dir'));
+
+            $this->fileRemover->setPdfFileRemover($pdfFileRemover);
+            $this->fileRemover->setImageFileRemover($imageRemover);
+            $this->fileRemover->setAttachmentFileRemover($attachmentFileRemover);
             $this->fileRemover->deleteMultiple($filePaths);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return new JsonResponse([
                 'success' => false,
                 'message' => $e->getMessage()
@@ -125,102 +137,110 @@ class PDFXhrController extends AbstractController
 
         return new JsonResponse([
             'success' => true,
-            'message' => 'PDF document and linked thumbnails deleted!'
+            'message' => 'PDF document and linked files deleted!'
         ]);
     }
 
     /**
-     * @Route("/documents/{document}/attachment/previews", name="view_all_attachments", methods={"GET"})
+     * @Route("/documents/{document}/attachment", name="download_attachment_resource", methods={"GET"})
      * @param Request $request
-     * @param ThumbnailFormatter $formatter
-     * @throws \Exception
+     * @throws Exception
+     * @return BinaryFileResponse
+     */
+    public function downloadAttachmentResource(Request $request): BinaryFileResponse
+    {
+        $pdfHashName = $request->get('document');
+
+        $fullPath = $this->dataRetriever->getLinkedAttachmentFullPath($pdfHashName);
+        if (!file_exists($fullPath)) {
+            throw new NotFoundHttpException('File does not exist in specified path: ' . $fullPath);
+        }
+        $response = new BinaryFileResponse($fullPath);
+        $response->setContentDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $request->get('document'));
+
+        return $response;
+    }
+
+    /**
+     * @Route("/documents/{document}/attachment/previews", name="view_images", methods={"GET"})
+     * @param Request $request
+     * @throws Exception
      * @return JsonResponse
      */
-    public function viewAllThumbnails(Request $request): JsonResponse
+    public function viewImages(Request $request): JsonResponse
     {
         try {
-            $response = $this->dataRetriever->getThumbnails($request);
-        } catch (\Exception $e) {
+            $response = $this->dataRetriever->getImages($request);
+        } catch (Exception $e) {
             return new JsonResponse([
                 'success' => false,
                 'message' => $e->getMessage()
             ]);
         }
 
-        dd($response);
-
         return new JsonResponse([
+            'success' => true,
             'data' => [
-                'items' => [1,2,3,4,]
+                'items' => $response
             ]
         ]);
-        $filename = $request->get('document');
-        if (null === $filename) {
-            throw new \Exception('Parameter `document` not received');
-        }
-
-//        $servie = new MySer();
-//        $ser->validate($request)
-//
-//        $filenameWithExtension = $filename . '.pdf';
-//
-//        /** @var PDFRepository $pdfRepository */
-//        $pdfRepository = $this->getDoctrine()->getRepository('App:PDF');
-//
-//        $entity = $pdfRepository->getEntityBy(['filename_MD5' => $filenameWithExtension]);
-//        if (null === $entity) {
-//            throw new \Exception('PDF record with filename ' . $filename . ' not found!');
-//        }
-//
-//        $pdfId = $entity->getId();
-//
-//        /** @var ThumbnailRepository $thumbnailRepository */
-//        $thumbnailRepository = $this->getDoctrine()->getRepository('App:Thumbnail');
-//
-//        $thumbnails = $thumbnailRepository->getRecordsBy(['pdf_id' => $pdfId]);
-//        $items = $formatter->format($thumbnails);
-//
-//        $thumbnailService = new ThumnailService();
-//        if ($errors = $thumbnailsService->validate($request)) {
-//            return JsonResponse::error([
-//                succes: false,
-//                'data' message errors..
-//
-//            ])
-//        }
-
-
-//        return $this->render('attachment_preview.html.twig', ['items' =>  $formattter->prepareResponse($humbnailService->retrieveThumbnails()));
-//        ]);
     }
 
     /**
-     * @Route("/documents/{document}/attachment/previews/{preview}", name="view_attachment", methods={"GET"})
+     * @Route("/documents/{document}/attachment/previews/{preview}", name="download_image_resource", methods={"GET"})
      * @param Request $request
-     * @param ThumbnailFormatter $formatter
-     * @throws \Exception
-     * @return Response
+     * @throws Exception
+     * @return BinaryFileResponse
      */
-    public function viewOneThumbnail(Request $request, ThumbnailFormatter $formatter): Response
+    public function downloadImageResource(Request $request): BinaryFileResponse
     {
-        $filename = $request->get('document');
-        if (null === $filename) {
-            throw new \Exception('Parameter `document` not received');
+        $imageName = $request->get('preview');
+        $fullPath = $this->getParameter('upload_image_dir') . $imageName;
+        $response = new BinaryFileResponse($fullPath);
+        $response->setContentDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $imageName);
+
+        return $response;
+    }
+
+    /**
+     * @Route("/documents/{document}/attachment", name="upload_attachment", methods={"POST"})
+     * @param Request $request
+     * @return JsonResponse
+     * @throws NoFileException
+     */
+    public function uploadAttachment(Request $request)
+    {
+        $pdfFilename = $request->get('document');
+        /** @var UploadedFile $uploadedFile */
+        $uploadedFile = $request->files->get('file');
+        if (null === $uploadedFile) {
+            throw new NoFileException('No file received');
         }
 
-        $thumbnailName = $request->get('preview');
-        if (null === $thumbnailName) {
-            throw new \Exception('Parameter `preview` not received');
+        try {
+            $this->dataRetriever->validateAttachmentNotExists($pdfFilename);
+            $uploadedFileModified = $this->uploadManager->uploadAttachment($uploadedFile);
+            $additionalData = [
+                'filename_original' => $uploadedFile->getClientOriginalName(),
+                'pdf_hash_filename' => $pdfFilename
+            ];
+            $saveResponse = $this->dataRetriever->saveAttachment($uploadedFileModified, $additionalData);
+            $this->dataRetriever->linkAttachmentToPdf($saveResponse);
+        } catch (AttachmentExistsException $e) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
+        } catch (Exception $e) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Upload failed with error: ' . $e->getMessage()
+            ]);
         }
 
-        $thumbnailNameWithExtension = $thumbnailName . '.jpg';
-
-        /** @var ThumbnailRepository $thumbnailRepository */
-        $thumbnailRepository = $this->getDoctrine()->getRepository('App:Thumbnail');
-
-        $thumbnail = $thumbnailRepository->getSingleRecordBy(['filename' => $thumbnailNameWithExtension]);
-        $item = $formatter->formatOne($thumbnail);
-
-        return $this->render('attachment_preview.html.twig', ['items' => [$item]]);
+        return new JsonResponse([
+            'success' => true,
+            'message' => 'File uploaded'
+        ]);
     }
 }

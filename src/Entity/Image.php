@@ -2,45 +2,47 @@
 
 namespace App\Entity;
 
-use App\Repository\ThumbnailRepository;
+use App\Repository\ImageRepository;
+use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass=ThumbnailRepository::class)
+ * @ORM\Entity(repositoryClass=ImageRepository::class)
+ * @ORM\Table(name="image",indexes={@ORM\Index(name="i_pdf_id", columns={"pdf_id"})})
  */
-class Thumbnail
+class Image
 {
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      */
-    private $id;
+    private ?int $id;
 
     /**
      * @ORM\Column(type="string", length=100)
      */
-    private $filename;
+    private ?string $filename;
 
     /**
      * @ORM\Column(type="smallint")
      */
-    private $page_nr;
+    private ?int $page_nr;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private ?int $size_in_bytes;
 
     /**
      * @ORM\Column(type="datetime")
      */
-    private $uploaded_at;
+    private ?DateTimeInterface $uploaded_at;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $size_in_bytes;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $pdf_id;
+    private ?int $pdf_id;
 
     public function getId(): ?int
     {
@@ -71,18 +73,6 @@ class Thumbnail
         return $this;
     }
 
-    public function getUploadedAt(): ?\DateTimeInterface
-    {
-        return $this->uploaded_at;
-    }
-
-    public function setUploadedAt(\DateTimeInterface $uploaded_at): self
-    {
-        $this->uploaded_at = $uploaded_at;
-
-        return $this;
-    }
-
     public function getSizeInBytes(): ?int
     {
         return $this->size_in_bytes;
@@ -91,6 +81,18 @@ class Thumbnail
     public function setSizeInBytes(int $size_in_bytes): self
     {
         $this->size_in_bytes = $size_in_bytes;
+
+        return $this;
+    }
+
+    public function getUploadedAt(): ?DateTimeInterface
+    {
+        return $this->uploaded_at;
+    }
+
+    public function setUploadedAt(DateTimeInterface $uploaded_at): self
+    {
+        $this->uploaded_at = $uploaded_at;
 
         return $this;
     }

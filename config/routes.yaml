@@ -8,27 +8,37 @@ documents:
   controller: App\Controller\Xhr\PDFXhrController::getDocuments
   methods: GET
 
-upload_document:
-  path: /documents
-  controller: App\Controller\Xhr\PDFXhrController::uploadDocument
-  methods: POST
-
 view_document:
   path: /documents/{document}
   controller: App\Controller\Xhr\PDFXhrController::viewDocument
   methods: GET
+
+upload_document:
+  path: /documents
+  controller: App\Controller\Xhr\PDFXhrController::uploadDocument
+  methods: POST
 
 delete_document:
   path: /documents/{document}
   controller: App\Controller\Xhr\PDFXhrController::deleteDocument
   methods: DELETE
 
-view_all_attachments:
-  path: /documents/{document}/attachment/previews
-  controller: App\Controller\Xhr\PDFXhrController::viewAllThumbnails
+download_attachment_resource:
+  path: /documents/{document}/attachment
+  controller: App\Controller\Xhr\PDFXhrController::downloadAttachmentResource
   methods: GET
 
-view_one_attachment:
-  path: /documents/{document}/attachment/previews/{preview}
-  controller: App\Controller\Xhr\PDFXhrController::viewOneThumbnail
+view_images:
+  path: /documents/{document}/attachment/previews
+  controller: App\Controller\Xhr\PDFXhrController::viewImages
   methods: GET
+
+download_image_resource:
+  path: /documents/{document}/attachment/previews/{preview}
+  controller: App\Controller\Xhr\PDFXhrController::downloadImageResource
+  methods: GET
+
+upload_attachment:
+  path: /documents/{document}/attachment
+  controller: App\Controller\Xhr\PDFXhrController::uploadAttachment
+  methods: POST

@@ -6,6 +6,7 @@ use App\Entity\PDF;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -21,38 +22,38 @@ class PDFRepository extends ServiceEntityRepository
         parent::__construct($registry, PDF::class);
     }
 
-    public function findByOffset($offset, $limit = 20)
+    public function findEntitiesByOffset($offset, $limit = 20)
     {
         return $this->createQueryBuilder('p')
             ->orderBy('p.uploaded_at', 'ASC')
             ->setFirstResult($offset)
             ->setMaxResults($limit)
             ->getQuery()
-            ->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY)
+            ->getResult()
         ;
     }
 
-    public function getLinkedThumbnails(string $filename)
+    public function getLinkedAttachment(string $filename)
     {
         return $this->createQueryBuilder('p')
-            ->select('t')
+            ->select('a')
             ->join(
-                'App\Entity\Thumbnail',
-                't',
-                \Doctrine\ORM\Query\Expr\Join::WITH,
-                'p.id = t.pdf_id'
+                'App\Entity\Attachment',
+                'a',
+                Join::WITH,
+                'p.id = a.pdf_id'
             )
-            ->where('p.filename_MD5 = :filename')
+            ->where('p.filename_hash = :filename')
             ->setParameter('filename', $filename)
             ->getQuery()
-            ->getResult();
+            ->getOneOrNullResult()
+        ;
     }
 
     /**
      * @param array $whereClauses
-     * @throws NoResultException
-     * @throws NonUniqueResultException
      * @return PDF
+     * @throws NonUniqueResultException|NoResultException
      */
     public function getEntityBy(array $whereClauses): PDF
     {
@@ -69,7 +70,27 @@ class PDFRepository extends ServiceEntityRepository
 
         return $request
             ->getQuery()
-            ->getSingleResult();
+            ->getSingleResult()
+        ;
     }
 
+    /**
+     * @param string $filename
+     * @return int|mixed|string
+     */
+    public function getLinkedPdfEntities(string $filename)
+    {
+        return $this->createQueryBuilder('p')
+            ->select('p')
+            ->join(
+                'App\Entity\Attachment',
+                'a',
+                Join::WITH,
+                'p.id = a.pdf_id'
+            )
+            ->where('p.filename_hash = :filename')
+            ->setParameter('filename', $filename)
+            ->getQuery()
+            ->getResult();
+    }
 }

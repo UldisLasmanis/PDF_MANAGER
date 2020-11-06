@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20201101164909 extends AbstractMigration
+final class Version20201106104444 extends AbstractMigration
 {
     public function getDescription() : string
     {
@@ -20,12 +20,16 @@ final class Version20201101164909 extends AbstractMigration
     public function up(Schema $schema) : void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE pdf ADD thumbnail_filename VARCHAR(100) NOT NULL');
+        $this->addSql('CREATE INDEX i_pdf_id ON attachment (pdf_id)');
+        $this->addSql('CREATE INDEX i_pdf_id ON image (pdf_id)');
+        $this->addSql('CREATE INDEX i_filename_hash ON pdf (filename_hash)');
     }
 
     public function down(Schema $schema) : void
     {
         // this down() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE pdf DROP thumbnail_filename');
+        $this->addSql('DROP INDEX i_pdf_id ON attachment');
+        $this->addSql('DROP INDEX i_pdf_id ON image');
+        $this->addSql('DROP INDEX i_filename_hash ON pdf');
     }
 }

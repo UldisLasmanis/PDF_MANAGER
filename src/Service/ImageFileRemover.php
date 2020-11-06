@@ -4,7 +4,7 @@
 namespace App\Service;
 
 
-class PdfFileRemover extends Remover
+class ImageFileRemover extends Remover
 {
     public function deleteFile(string $filename)
     {
