@@ -20,6 +20,18 @@ Create empty database `sunfinance` (name can be changed in .env file)
 Migrate migrations to DB
 > php bin/console doctrine:migrations:migrate
 
+To access project open `localhost` in browser
+
+#### Note:  
+If file upload is not working, most probably it's because of wrong project folder permissions.  
+To see current ownership, run: 
+> ll .
+
+If folder owner is `your_root_username` (ex. `uldis`), then run this command if you're running `apache2` server.  
+> sudo chown -R www-data .
+
+Now you should be able to upload/remove files
+
 # Using
 Upload:  
 ![alt text](https://github.com/UldisLasmanis/PDF_Manager/blob/master/public/instructions/upload_instructions.png?raw=true)
