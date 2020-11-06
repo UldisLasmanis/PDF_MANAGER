@@ -2,15 +2,15 @@
 
 namespace App\Entity;
 
-use App\Repository\PDFRepository;
+use App\Repository\AttachmentRepository;
 use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass=PDFRepository::class)
- * @ORM\Table(name="pdf",indexes={@ORM\Index(name="i_filename_hash", columns={"filename_hash"})})
+ * @ORM\Entity(repositoryClass=AttachmentRepository::class)
+ * @ORM\Table(name="attachment",indexes={@ORM\Index(name="i_pdf_id", columns={"pdf_id"})})
  */
-class PDF
+class Attachment
 {
     /**
      * @ORM\Id
@@ -30,11 +30,6 @@ class PDF
     private ?string $filename_hash;
 
     /**
-     * @ORM\Column(type="smallint")
-     */
-    private ?int $page_cnt;
-
-    /**
      * @ORM\Column(type="integer")
      */
     private ?int $size_in_bytes;
@@ -45,14 +40,9 @@ class PDF
     private ?DateTimeInterface $uploaded_at;
 
     /**
-     * @ORM\Column(type="string", length=100)
+     * @ORM\Column(name="pdf_id", type="integer")
      */
-    private ?string $preview_image_filename;
-
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
-    private ?int $attachment_id;
+    private ?int $pdf_id;
 
     public function getId(): ?int
     {
@@ -83,18 +73,6 @@ class PDF
         return $this;
     }
 
-    public function getPageCnt(): ?int
-    {
-        return $this->page_cnt;
-    }
-
-    public function setPageCnt(int $page_cnt): self
-    {
-        $this->page_cnt = $page_cnt;
-
-        return $this;
-    }
-
     public function getSizeInBytes(): ?int
     {
         return $this->size_in_bytes;
@@ -119,26 +97,14 @@ class PDF
         return $this;
     }
 
-    public function getPreviewImageFilename(): ?string
+    public function getPdfId(): ?int
     {
-        return $this->preview_image_filename;
+        return $this->pdf_id;
     }
 
-    public function setPreviewImageFilename(string $preview_image_filename): self
+    public function setPdfId(int $pdf_id): self
     {
-        $this->preview_image_filename = $preview_image_filename;
-
-        return $this;
-    }
-
-    public function getAttachmentId(): ?int
-    {
-        return $this->attachment_id;
-    }
-
-    public function setAttachmentId(?int $attachment_id): self
-    {
-        $this->attachment_id = $attachment_id;
+        $this->pdf_id = $pdf_id;
 
         return $this;
     }

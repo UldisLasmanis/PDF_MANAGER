@@ -4,35 +4,35 @@
 namespace App\Formatter;
 
 
-use App\Exceptions\MyThrownException;
+use App\Entity\PDF;
 
 class PdfFormatter
 {
-    private $targetPdfDirectory;
-    private $targetThumbnailDirectory;
+    private string $targetPdfDirectory;
+    private string $targetImageDirectory;
 
-//    public function __construct($targetPdfDirectory, $targetThumbnailDirectory)
-//    {
-//        $this->targetPdfDirectory = $targetPdfDirectory;
-//        $this->targetThumbnailDirectory = $targetThumbnailDirectory;
-//    }
-
-    public function format(array $items): array
+    public function format(array $entities): array
     {
         $result = [];
-        foreach ($items as $item) {
-            $result[] = [
-                'original_filename' => $item['filename_original'],
-                'md5_filename' => $item['filename_MD5'],
-                'file_path' => $this->getTargetDir() . $item['filename_MD5'],
-                'thumbnail_path' => $this->getTargetThumbnailDir() . $item['thumbnail_filename'],
-                'size_in_KB' => round($item['size_in_bytes'] / 1024, 2),
-                'page_cnt' => $item['page_cnt'],
-                'uploaded_at' => $item['uploaded_at']->format('Y-m-d H:i:s')
-            ];
+        foreach ($entities as $entity) {
+            $result[] = $this->formatOne($entity);
         }
 
         return $result;
+    }
+
+    public function formatOne(PDF $entity): array
+    {
+        return [
+            'filename_original' => $entity->getFilenameOriginal(),
+            'filename_hash' => $entity->getFilenameHash(),
+            'file_path' => $this->getTargetDir() . $entity->getFilenameHash(),
+            'preview_image_path' => $this->getTargetImageDir() . $entity->getPreviewImageFilename(),
+            'size_in_KB' => round($entity->getSizeInBytes() / 1024, 2),
+            'page_cnt' => $entity->getPageCnt(),
+            'uploaded_at' => $entity->getUploadedAt()->format('Y-m-d H:i:s'),
+            'attachment_id' => $entity->getAttachmentId()
+        ];
     }
 
     public function getTargetDir(): string
@@ -45,13 +45,13 @@ class PdfFormatter
         $this->targetPdfDirectory = $targetDir;
     }
 
-    public function getTargetThumbnailDir(): string
+    public function getTargetImageDir(): string
     {
-        return $this->targetThumbnailDirectory;
+        return $this->targetImageDirectory;
     }
 
-    public function setTargetThumbnailDir(string $targetDir)
+    public function setTargetImageDir(string $targetDir)
     {
-        $this->targetThumbnailDirectory = $targetDir;
+        $this->targetImageDirectory = $targetDir;
     }
 }
